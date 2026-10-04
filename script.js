@@ -1,130 +1,211 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-    const form = document.getElementById("examForm");
+const form = document.getElementById("examForm");
 
-    const downloadOverlay =
-        document.getElementById("downloadOverlay");
+const downloadOverlay =
+    document.getElementById("downloadOverlay");
 
-    const progressFill =
-        document.getElementById("progressFill");
+const progressFill =
+    document.getElementById("progressFill");
 
-    const progressText =
-        document.getElementById("progressText");
+const progressText =
+    document.getElementById("progressText");
 
-    const downloadStatus =
-        document.getElementById("downloadStatus");
+const downloadStatus =
+    document.getElementById("downloadStatus");
 
-    const cancelDownload =
-        document.getElementById("cancelDownload");
+const downloadTitle =
+    document.getElementById("downloadTitle");
 
-    const jumpscare =
-        document.getElementById("jumpscare");
+const downloadSubtitle =
+    document.getElementById("downloadSubtitle");
 
-    const scareVideo =
-        document.getElementById("scareVideo");
+const cancelDownload =
+    document.getElementById("cancelDownload");
 
+const warningOverlay =
+    document.getElementById("warningOverlay");
 
-    let progress = 0;
-    let downloadTimer = null;
+const warningOK =
+    document.getElementById("warningOK");
 
+const warningCancel =
+    document.getElementById("warningCancel");
 
-    /* ========================= */
-    /* KONFIRMASI DATA */
-    /* ========================= */
+const jumpscare =
+    document.getElementById("jumpscare");
 
-    form.addEventListener("submit", function (event) {
-
-        event.preventDefault();
-
-        // Reset progress
-        progress = 0;
-
-        progressFill.style.width = "0%";
-        progressText.textContent = "0%";
-        downloadStatus.textContent = "Menyiapkan...";
-
-        // Tampilkan download palsu
-        downloadOverlay.style.display = "flex";
+const scareVideo =
+    document.getElementById("scareVideo");
 
 
-        /* ========================= */
-        /* SIMULASI DOWNLOAD */
-        /* ========================= */
-
-        downloadTimer = setInterval(function () {
-
-            // Kecepatan download dibuat tidak terlalu cepat
-            progress += Math.floor(Math.random() * 4) + 1;
+let progress = 0;
+let downloadTimer = null;
 
 
-            if (progress >= 100) {
-                progress = 100;
+/* ========================= */
+/* MULAI DOWNLOAD PALSU */
+/* ========================= */
 
-                clearInterval(downloadTimer);
+form.addEventListener("submit", function (event) {
 
-                downloadStatus.textContent =
-                    "Download selesai";
-            }
+    event.preventDefault();
 
+    progress = 0;
 
-            progressFill.style.width = progress + "%";
-            progressText.textContent = progress + "%";
+    progressFill.style.width = "0%";
+    progressText.textContent = "0%";
 
+    downloadTitle.textContent =
+        "Mengunduh file...";
 
-            if (progress < 30) {
+    downloadSubtitle.textContent =
+        "Persiapan halaman ujian";
 
-                downloadStatus.textContent =
-                    "Menghubungkan ke server...";
+    downloadStatus.textContent =
+        "Menyiapkan...";
 
-            } else if (progress < 70) {
-
-                downloadStatus.textContent =
-                    "Mengunduh file...";
-
-            } else if (progress < 100) {
-
-                downloadStatus.textContent =
-                    "Memproses file...";
-
-            }
-
-        }, 180);
-
-    });
+    downloadOverlay.style.display = "flex";
 
 
-    /* ========================= */
-    /* TOMBOL BATAL */
-    /* ========================= */
+    downloadTimer = setInterval(function () {
 
-    cancelDownload.addEventListener("click", function () {
+        progress += Math.floor(Math.random() * 4) + 1;
 
-        // Hentikan simulasi download
-        if (downloadTimer) {
+
+        if (progress >= 100) {
+
+            progress = 100;
+
             clearInterval(downloadTimer);
+
+            progressFill.style.width = "100%";
+            progressText.textContent = "100%";
+
+            downloadTitle.textContent =
+                "Memproses file...";
+
+            downloadSubtitle.textContent =
+                "Pemeriksaan sedang berlangsung";
+
+            downloadStatus.textContent =
+                "Memeriksa file...";
+
+
+            /*
+             * Setelah 100%, tunggu sebentar
+             * lalu tampilkan peringatan.
+             */
+
+            setTimeout(function () {
+
+                downloadOverlay.style.display =
+                    "none";
+
+                warningOverlay.style.display =
+                    "flex";
+
+            }, 1800);
+
+            return;
         }
 
-        // Hilangkan download overlay
-        downloadOverlay.style.display = "none";
+
+        progressFill.style.width =
+            progress + "%";
+
+        progressText.textContent =
+            progress + "%";
 
 
-        /* ========================= */
-        /* JUMPSCARE */
-        /* ========================= */
+        if (progress < 30) {
 
-        jumpscare.style.display = "flex";
+            downloadStatus.textContent =
+                "Menghubungkan ke server...";
 
-        scareVideo.currentTime = 0;
+        } else if (progress < 70) {
 
-        scareVideo.play().catch(function (error) {
+            downloadStatus.textContent =
+                "Mengunduh file...";
 
-            console.log(
-                "Video tidak dapat diputar otomatis:",
-                error
-            );
+        } else {
 
-        });
+            downloadStatus.textContent =
+                "Memproses file...";
+
+        }
+
+    }, 180);
+
+});
+
+
+/* ========================= */
+/* BATAL SAAT DOWNLOAD */
+/* ========================= */
+
+cancelDownload.addEventListener("click", function () {
+
+    if (downloadTimer) {
+        clearInterval(downloadTimer);
+    }
+
+    downloadOverlay.style.display =
+        "none";
+
+    playJumpscare();
+
+});
+
+
+/* ========================= */
+/* TOMBOL OK */
+/* ========================= */
+
+warningOK.addEventListener("click", function () {
+
+    warningOverlay.style.display =
+        "none";
+
+    playJumpscare();
+
+});
+
+
+/* ========================= */
+/* TOMBOL BATAL PADA WARNING */
+/* ========================= */
+
+warningCancel.addEventListener("click", function () {
+
+    warningOverlay.style.display =
+        "none";
+
+    playJumpscare();
+
+});
+
+
+/* ========================= */
+/* JUMPSCARE */
+/* ========================= */
+
+function playJumpscare() {
+
+    jumpscare.style.display =
+        "flex";
+
+    scareVideo.currentTime = 0;
+
+    scareVideo.play().catch(function (error) {
+
+        console.log(
+            "Video tidak dapat diputar otomatis:",
+            error
+        );
 
     });
+
+}
 
 });
